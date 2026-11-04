@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if is_edit %}Edit {{ product.name }}{% else %}Add Product{% endif %}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            {% if is_edit %}Edit Product{% else %}Add Product{% endif %}
+        </h1>
+        <p class="page-subtitle">
+            {% if is_edit %}
+                Updating <span class="fw-semibold">{{ product.name }}</span>
+            {% else %}
+                New product in your organization
+            {% endif %}
+        </p>
+    </div>
+    <a href="{% url 'products' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Back to products
+    </a>
+</div>
+
+<div class="app-card">
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="field-error mb-3">
+                {% for error in form.non_field_errors %}
+                    <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label">
+                    Product Name <span class="text-danger">*</span>
+                </label>
+                {{ form.name }}
+                {% for error in form.name.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.sku.id_for_label }}" class="form-label">
+                    SKU <span class="text-danger">*</span>
+                </label>
+                {{ form.sku }}
+                {% for error in form.sku.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-12 mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% for error in form.description.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+                <label for="{{ form.quantity.id_for_label }}" class="form-label">
+                    Quantity on Hand <span class="text-danger">*</span>
+                </label>
+                {{ form.quantity }}
+                {% for error in form.quantity.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+                <label for="{{ form.cost_price.id_for_label }}" class="form-label">
+                    Cost Price <span class="text-danger">*</span>
+                </label>
+                {{ form.cost_price }}
+                {% for error in form.cost_price.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+                <label for="{{ form.selling_price.id_for_label }}" class="form-label">
+                    Selling Price <span class="text-danger">*</span>
+                </label>
+                {{ form.selling_price }}
+                {% for error in form.selling_price.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+                <label for="{{ form.low_stock_threshold.id_for_label }}" class="form-label">{{ form.low_stock_threshold.label }}</label>
+                {{ form.low_stock_threshold }}
+                {% if form.low_stock_threshold.help_text %}
+                    <div class="form-text">{{ form.low_stock_threshold.help_text }}</div>
+                {% endif %}
+                {% for error in form.low_stock_threshold.errors %}
+                    <div class="field-error mt-1">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr>
+        <button type="submit" class="btn btn-brand">
+            {% if is_edit %}
+                <i class="bi bi-check-lg me-1"></i> Save changes
+            {% else %}
+                <i class="bi bi-plus-lg me-1"></i> Add product
+            {% endif %}
+        </button>
+        <a href="{% url 'products' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

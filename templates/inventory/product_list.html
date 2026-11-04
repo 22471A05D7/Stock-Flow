@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Products{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Products</h1>
+        <p class="page-subtitle">{{ total_count }} product(s) in your organization</p>
+    </div>
+    <a href="{% url 'add_product' %}" class="btn btn-brand">
+        <i class="bi bi-plus-lg me-1"></i> Add Product
+    </a>
+</div>
+
+<div class="app-card">
+    <form method="get" class="d-flex gap-2 mb-3" role="search">
+        <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                class="form-control"
+                placeholder="Search by product name or SKU..."
+                aria-label="Search products">
+        </div>
+        <button type="submit" class="btn btn-outline-primary px-3">Search</button>
+        {% if query %}
+            <a href="{% url 'products' %}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+    {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle product-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Status</th>
+                        <th style="width:130px" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td class="fw-semibold">{{ product.name }}</td>
+                            <td><span class="sku-chip">{{ product.sku }}</span></td>
+                            <td class="text-center">{{ product.quantity }}</td>
+                            <td class="text-center">
+                                {% if product.is_out_of_stock %}
+                                    <span class="product-badge bg-danger">Out of stock</span>
+                                {% elif product.is_low_stock %}
+                                    <span class="product-badge bg-warning text-dark">Low stock</span>
+                                {% else %}
+                                    <span class="product-badge bg-success">In stock</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'product_edit' product.pk %}"
+                                   class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-url="{% url 'product_delete' product.pk %}"
+                                        data-name="{{ product.name }}"
+                                        title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-box-seam empty-icon"></i>
+            {% if query %}
+                <h5>No products match "{{ query }}"</h5>
+                <p class="text-secondary">Try a different name or SKU.</p>
+            {% else %}
+                <h5>No products yet</h5>
+                <p class="text-secondary">Add your first product to start tracking inventory.</p>
+                <a href="{% url 'add_product' %}" class="btn btn-brand mt-1">
+                    <i class="bi bi-plus-lg me-1"></i> Add Product
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Delete confirmation modal (shared by all rows) -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center pt-4">
+                <i class="bi bi-trash3 delete-icon"></i>
+                <h5 class="mt-2">Delete product?</h5>
+                <p class="text-secondary mb-4">
+                    <strong id="deleteProductName"></strong> will be permanently removed.
+                </p>
+                <form id="deleteForm" method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary w-100"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger w-100">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
